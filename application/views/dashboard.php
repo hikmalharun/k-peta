@@ -43,7 +43,7 @@
                 $today = date_default_timezone_set('Asia/Jakarta');
                 $today = date('H:i:s');
                 $skema_masuk = '07:00:00';
-                $skema_pulang = '15:00:00';
+                $skema_pulang = '12:00:00';
                 ?>
                 <div class="card card-profile">
                     <img src="<?php echo base_url(); ?>assets/images/bg-profile.jpg" class="img-fluid card-img-top" alt="Profile Cover Photo">
@@ -53,25 +53,42 @@
                                 <div class="avatar">
                                     <?php if ($user['gambar'] == 'default.jpg') { ?>
                                         <?php if ($today > $skema_pulang) { ?>
-                                            <a href="<?php echo $link1; ?>">
-                                                <span class="text-warning" style="font-size: 5em; padding-left: 21px; padding-right: 21px;">
-                                                    <i class="far fa-bell"></i>
-                                                </span>
-                                            </a>
+                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
+                                                <i class="far fa-bell"></i>
+                                            </span>
+                                            <!-- <a href="<?php echo $link1; ?>">
+                                            </a> -->
                                         <?php } else { ?>
                                             <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } else { ?>
                                         <?php if ($today > $skema_pulang) { ?>
-                                            <a href="<?php echo $link1; ?>">
-                                                <span class="text-warning" style="font-size: 5em; padding-left: 21px; padding-right: 21px;">
-                                                    <i class="far fa-bell"></i>
-                                                </span>
-                                            </a>
+                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
+                                                <i class="far fa-bell"></i>
+                                            </span>
+                                            <!-- <a href="<?php echo $link1; ?>">
+                                            </a> -->
                                         <?php } else { ?>
                                             <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } ?>
+                                    <div class="disabled-backdrop-ex">
+                                        <div class="modal fade text-start" id="backdrop" tabindex="-1" aria-labelledby="myModalLabel4" data-bs-backdrop="false" aria-hidden="true" style="background-color: rgba(0,0,0,2);">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <video autoplay="true" id="video-webcam" style="width: 100%;"></video>
+                                                        <button type="button" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2" onclick="takeSnapshot()" data-bs-dismiss="modal">
+                                                            <i class="fas fa-camera"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -192,13 +209,6 @@
                 </div>
             </section>
             <section>
-
-                <div>
-                    <video autoplay="true" id="video-webcam"></video>
-                </div>
-
-                <button class="btn btn-success" onclick="takeSnapshot()">Ambil Gambar</button>
-
                 <script type="text/javascript">
                     // seleksi elemen video
                     var video = document.querySelector("#video-webcam");
@@ -211,7 +221,7 @@
                         // jalankan fungsi handleVideo, dan videoError jika izin ditolak
                         navigator.getUserMedia({
                             audio: false,
-                            video: true
+                            video: true,
                         }, handleVideo, videoError);
                     }
 
