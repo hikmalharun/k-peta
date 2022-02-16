@@ -329,4 +329,89 @@ class Pegawai extends CI_Controller
         $this->session->set_flashdata('profile', '<div class="alert alert-success fade show" role="alert">Data profile berhasil diubah.</div>');
         redirect('admin/pegawai/profile');
     }
+
+    public function add_user()
+    {
+        $name = $this->input->post('name');
+        $sekolah = $this->input->post('sekolah');
+        $email = $this->input->post('email');
+        $length = 8;
+        $password = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'), 1, $length);
+        $generate_password = md5($password);
+        $is_sekolah = $this->db->get_where('daftar_pegawai', ['sekolah' => $sekolah])->row_array();
+
+        $data = array(
+            'name' => $name,
+            'email' => $email,
+            'npsn' => $is_sekolah['npsn'],
+            'sekolah' => $is_sekolah['sekolah'],
+            'jabatan' => '-',
+            'alamat' => '-',
+            'gambar' => 'default.jpg',
+            'password' => $generate_password,
+            'password_default' => $password,
+            'role_id' => 2,
+            'status' => 0,
+            'tanggal_add' => time(),
+        );
+        //Generate token
+        $leght_token = 77;
+        $token = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'), 1, $leght_token);
+        $user_token = [
+            'email' => $email,
+            'token' => $token,
+            'tanggal_add' => time()
+        ];
+        $this->Authtentication_model->insert_pengguna('pengguna', $data);
+        $this->Authtentication_model->insert_token('token', $user_token);
+        $type = 'Verifikasi Akun';
+        //Kirim email verifikasi
+        $this->_sendEmail($token, $name, $password, $type);
+        $this->session->set_flashdata('pesan_token', '<div class="alert alert-success" role="alert">Silahkan lakukan verifikasi akun melalui email.</div>');
+        redirect('admin/pegawai/data_pegawai');
+    }
+
+    private function _sendEmail($token, $name, $password, $type)
+    {
+        if ($type == 'Verifikasi Akun') {
+            $message = '
+			<center><img src="https://sman1anjatan.sch.id/assets/images/logosmanja.png" style="width:100px;"/></center>
+			<h2 style="width:100%;heoght:200px;text-align:center;background-color:blue;color:white;margin:10px 0 10px 0;">Verifikasi Akun</h2><p>Kepada <b>Yth. ' . $name . '</b><br>
+			Berikut kami kirim link verifikasi akun anda, caranya klik tombol berikut <br>
+			<a href="' . base_url() . 'authentication/verify_account?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '">
+			<button style="background-color:green; color: white;width: 100%; height: 50px; border: 0px solid #fff; border-radius: 5px; cursor: pointer;">VERIFIKASI</button>
+			</a><br>
+			atau dengan cara klik link berikut : <br>
+			<a href="' . base_url() . 'authentication/verify_account?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '">' . base_url() . 'authentication/verify_account?email=' . $this->input->post('email') . '&token=' . urlencode($token) . '</a><br><br>
+			<table><tr><td>Username</td><td>:</td><td>' . $this->input->post('email') . '</td></tr><tr><td>Password</td><td>:</td><td>' . $password . '</td></tr></table><br><br>
+			Waktu verifikasi akun hanya tersedia 24 jam setelah menerima link diatas.</p>
+			';
+        } else {
+            $message = '
+			<center><img src="https://sman1anjatan.sch.id/assets/images/logosmanja.png" style="width:100px;"/></center>
+			<h2 style="width:100%;heoght:200px;text-align:center;background-color:blue;color:white;margin:10px 0 10px 0;">Recovery Password</h2><p>Kepada <b>Yth. ' . $name . '</b><br>
+			Berikut kami kirim email dan password anda :
+			<table><tr><td>Username</td><td>:</td><td>' . $token . '</td></tr><tr><td>Password</td><td>:</td><td>' . $password . '</td></tr></table><br><br></p>
+			';
+        }
+        $config = [
+            'protocol' => 'smtp',
+            'smtp_host' => 'ssl://smtp.googlemail.com',
+            'smtp_user' => 'kpeta.activation@gmail.com',
+            'smtp_pass' => 'admin123*',
+            'smtp_port' => 465,
+            'mailtype' => 'html',
+            'charset' => 'utf-8',
+            'newline' => "\r\n"
+        ];
+
+        $this->load->library('email', $config);
+        $this->email->initialize($config);
+
+        $this->email->from('info@sman1anjatan.sch.id', 'ADMIN K-PETA SMAN 1 ANJATAN');
+        $this->email->to($this->input->post('email'));
+        $this->email->subject($type);
+        $this->email->message($message);
+        $this->email->send();
+    }
 }

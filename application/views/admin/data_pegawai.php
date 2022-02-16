@@ -6,6 +6,7 @@
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper container-xxl p-0">
         <div class="content-header row"></div>
+        <?php echo $this->session->flashdata('pesan_token'); ?>
         <section>
             <div class="content-body">
                 <div class="card">
@@ -17,7 +18,8 @@
                             </button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#import_pegawai"><i data-feather='upload'></i> Import</a>
-                                <a class="dropdown-item" href="<?php echo base_url('admin/pegawai/delete_pns') ?>"><i data-feather='trash'></i> Delete PNS</a>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#add_user"><i data-feather='user'></i> Tambah Pengguna</a>
+                                <a class=" dropdown-item" href="<?php echo base_url('admin/pegawai/delete_pns') ?>"><i data-feather='trash'></i> Delete PNS</a>
                                 <a class="dropdown-item" href="<?php echo base_url('admin/pegawai/delete_pppk') ?>"><i data-feather='trash'></i> Delete PPPK</a>
                             </div>
                         </div>
@@ -44,6 +46,34 @@
                                 </div>
                                 <div class="modal-footer">
                                     <span class="badge badge-light-danger">File yang diupload adalah data excel yang diunduh dari dapodik sekolah</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal End -->
+                    <!-- Modal Start-->
+                    <div class="modal fade text-start" id="add_user" tabindex="-1" aria-labelledby="myModalLabel4" data-bs-backdrop="false" aria-hidden="true" style="background: rgba(0,0,0,0.5);">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel4">Tambah Pengguna</h4>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="<?php echo base_url('admin/pegawai/add_user'); ?>" class="" enctype="multipart/form-data">
+                                        <label for="name">Nama Lengkap</label>
+                                        <input id="name" name="name" type="text" class="form-control mb-1" placeholder="Nama Lengkap" required>
+                                        <label for="email">Email</label>
+                                        <input id="email" name="email" type="text" class="form-control mb-1" placeholder="Email" required>
+                                        <label for="sekolah">Sekolah</label>
+                                        <select name="sekolah" class="form-control mb-1" required>
+                                            <option value="">Pilih Sekolah</option>
+                                            <?php foreach ($sekolah as $skl) : ?>
+                                                <option value="<?php echo $skl->nama; ?>"><?php echo $skl->nama; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="submit" class="btn btn-success float-end">Simpan</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
