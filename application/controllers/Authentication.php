@@ -170,7 +170,7 @@ class Authentication extends CI_Controller
 					redirect('authentication/verify');
 				}
 			} else {
-				$this->session->set_flashdata('pesan_token', '<div class="alert alert-danger" role="alert">Mohon maaf nama sekolah salah.</div>');
+				$this->session->set_flashdata('pesan_token', '<div class="alert alert-danger" role="alert">Mohon maaf nama sekolah tidak cocok atau email belum tersedia.</div>');
 				redirect('authentication/verify');
 			}
 		}

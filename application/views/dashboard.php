@@ -39,9 +39,10 @@
                     </table>
                 </div>
                 <?php
-                $link1 = base_url('kehadiran/masuk');
-                $today = date_default_timezone_set('Asia/Jakarta');
-                $today = date('H:i:s');
+                $tanggal_now = date_default_timezone_set('Asia/Jakarta');
+                $tanggal_now = date('d-m-Y');
+                $jam_now = date_default_timezone_set('Asia/Jakarta');
+                $jam_now = date('H:i:s');
                 $skema_masuk = '07:00:00';
                 $skema_pulang = '12:00:00';
                 ?>
@@ -52,7 +53,7 @@
                             <div class="profile-image">
                                 <div class="avatar">
                                     <?php if ($user['gambar'] == 'default.jpg') { ?>
-                                        <?php if ($today > $skema_pulang) { ?>
+                                        <?php if ($jam_now > $skema_masuk) { ?>
                                             <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
                                                 <i class="far fa-bell"></i>
                                             </span>
@@ -62,7 +63,7 @@
                                             <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } else { ?>
-                                        <?php if ($today > $skema_pulang) { ?>
+                                        <?php if ($jam_now > $skema_masuk) { ?>
                                             <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
                                                 <i class="far fa-bell"></i>
                                             </span>
@@ -81,7 +82,7 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <video autoplay="true" id="video-webcam" style="width: 100%;"></video>
-                                                        <button type="button" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2" onclick="takeSnapshot()" data-bs-dismiss="modal">
+                                                        <button type="button" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2" onclick="absen()" data-bs-dismiss="modal">
                                                             <i class="fas fa-camera"></i>
                                                         </button>
                                                     </div>
@@ -238,29 +239,31 @@
                 </script>
 
                 <script>
-                    function takeSnapshot() {
-                        // buat elemen img
-                        var img = document.createElement('img');
-                        var context;
+                    $(document).on('click', '#absen', function(e) {
+                        e.preventDefault();
+                        var file_data = $('#video-webcam').prop('files')[0];
+                        var form_data = new FormData();
 
-                        // ambil ukuran video
-                        var width = video.offsetWidth,
-                            height = video.offsetHeight;
-
-                        // buat elemen canvas
-                        canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        // ambil gambar dari video dan masukan 
-                        // ke dalam canvas
-                        context = canvas.getContext('2d');
-                        context.drawImage(video, 0, 0, width, height);
-
-                        // render hasil dari canvas ke elemen img
-                        img.src = canvas.toDataURL('image/png');
-                        document.body.appendChild(img);
-                    }
+                        form_data.append('file', file_data);
+                        $.ajax({
+                            url: '<?php echo site_url("pegawai/absen") ?>', // point to server-side PHP script
+                            dataType: 'json', // what to expect back from the PHP script, if anything
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: form_data,
+                            type: 'post',
+                            success: function(data, status) {
+                                //alert(php_script_response); // display response from the PHP script, if any
+                                if (data.status != 'error') {
+                                    $('#video-webcam').val('');
+                                    alert(data.msg);
+                                } else {
+                                    alert(data.msg);
+                                }
+                            }
+                        });
+                    })
                 </script>
             </section>
             <!-- Dashboard Analytics end -->
