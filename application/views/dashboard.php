@@ -54,42 +54,22 @@
                                 <div class="avatar">
                                     <?php if ($user['gambar'] == 'default.jpg') { ?>
                                         <?php if ($jam_now > $skema_masuk) { ?>
-                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
+                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#absen">
                                                 <i class="far fa-bell"></i>
                                             </span>
-                                            <!-- <a href="<?php echo $link1; ?>">
-                                            </a> -->
                                         <?php } else { ?>
                                             <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } else { ?>
                                         <?php if ($jam_now > $skema_masuk) { ?>
-                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#backdrop">
+                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#absen">
                                                 <i class="far fa-bell"></i>
                                             </span>
-                                            <!-- <a href="<?php echo $link1; ?>">
-                                            </a> -->
                                         <?php } else { ?>
                                             <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } ?>
-                                    <div class="disabled-backdrop-ex">
-                                        <div class="modal fade text-start" id="backdrop" tabindex="-1" aria-labelledby="myModalLabel4" data-bs-backdrop="false" aria-hidden="true" style="background-color: rgba(0,0,0,2);">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <video autoplay="true" id="video-webcam" style="width: 100%;"></video>
-                                                        <button type="button" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2" onclick="absen()" data-bs-dismiss="modal">
-                                                            <i class="fas fa-camera"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -210,13 +190,45 @@
                 </div>
             </section>
             <section>
+                <div class="disabled-backdrop-ex">
+                    <div class="modal fade text-start" id="absen" tabindex="-1" aria-labelledby="myModalLabel4" data-bs-backdrop="false" aria-hidden="true" style="background-color: rgba(0,0,0,2);">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" id="absen">
+                                        <input type="hidden" id="nama" value="<?php echo $user['name']; ?>">
+                                        <input type="hidden" id="email" value="<?php echo $user['email']; ?>">
+                                        <input type="hidden" id="sekolah" value="<?php echo $user['sekolah']; ?>">
+                                        <?php
+                                        $abs = $this->db->get_where('absen', ['tanggal_absen' => date('d-m-Y')])->num_rows();
+                                        $abs = $this->db->get_where('absen', ['email' => $user['email']])->num_rows();
+                                        ?>
+                                        <?php
+                                        if ($abs > 0) { ?>
+                                            <input type="hidden" id="status_absen" value="Pulang">
+                                        <?php } else { ?>
+                                            <input type="hidden" id="status_absen" value="Masuk">
+                                        <?php } ?>
+                                        <input type="hidden" id="tanggal_absen" value="<?php echo date('d-m-Y'); ?>">
+                                        <input type="hidden" id="jam_absen" value="<?php echo date('H:i:s'); ?>">
+                                        <video autoplay="true" id="gambar" style="width: 100%;"></video>
+                                        <button type="submit" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2">
+                                            <i class="fas fa-camera"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <script type="text/javascript">
                     // seleksi elemen video
-                    var video = document.querySelector("#video-webcam");
-
+                    var video = document.querySelector("#gambar");
                     // minta izin user
                     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
-
                     // jika user memberikan izin
                     if (navigator.getUserMedia) {
                         // jalankan fungsi handleVideo, dan videoError jika izin ditolak
@@ -225,45 +237,38 @@
                             video: true,
                         }, handleVideo, videoError);
                     }
-
                     // fungsi ini akan dieksekusi jika  izin telah diberikan
                     function handleVideo(stream) {
                         video.srcObject = stream;
                     }
-
                     // fungsi ini akan dieksekusi kalau user menolak izin
                     function videoError(e) {
                         // do something
                         alert("Izinkan menggunakan camera")
                     }
                 </script>
-
                 <script>
-                    $(document).on('click', '#absen', function(e) {
-                        e.preventDefault();
-                        var file_data = $('#video-webcam').prop('files')[0];
-                        var form_data = new FormData();
-
-                        form_data.append('file', file_data);
+                    $(document).on('submit', '#absen', function(event) {
+                        event.preventDefault();
+                        var nama = $('#nama').val();
+                        var email = $('#email').val();
+                        var sekolah = $('#sekolah').val();
+                        var status_absen = $('#status_absen').val();
+                        var tanggal_absen = $('#tanggal_absen').val();
+                        var jam_absen = $('#jam_absen').val();
+                        var gambar = $("#gambar").val();
                         $.ajax({
-                            url: '<?php echo site_url("pegawai/absen") ?>', // point to server-side PHP script
-                            dataType: 'json', // what to expect back from the PHP script, if anything
-                            cache: false,
+                            url: "<?php echo base_url() . 'pegawai/absen' ?>",
+                            method: 'POST',
+                            data: new FormData(this),
                             contentType: false,
                             processData: false,
-                            data: form_data,
-                            type: 'post',
-                            success: function(data, status) {
-                                //alert(php_script_response); // display response from the PHP script, if any
-                                if (data.status != 'error') {
-                                    $('#video-webcam').val('');
-                                    alert(data.msg);
-                                } else {
-                                    alert(data.msg);
-                                }
+                            success: function() {
+                                $('#absen').modal('hide');
+                                alert('Absen berhasil.');
                             }
                         });
-                    })
+                    });
                 </script>
             </section>
             <!-- Dashboard Analytics end -->

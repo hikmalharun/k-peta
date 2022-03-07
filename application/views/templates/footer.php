@@ -31,7 +31,7 @@
 <!-- BEGIN: Page JS-->
 <!-- <script src="<?php echo base_url(); ?>app-assets/js/scripts/pages/dashboard-analytics.js"></script> -->
 <script src="<?php echo base_url(); ?>app-assets/js/scripts/pages/app-invoice-list.js"></script>
-<script src="<?php echo base_url(); ?>assets/fontawesome/js/all.min.js"></script>
+<!-- <script src="<?php echo base_url(); ?>assets/fontawesome/js/all.min.js"></script> -->
 <!-- END: Page JS-->
 
 <script>
@@ -47,44 +47,11 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#sekolah').DataTable({
+        $('#table').DataTable({
             responsive: true,
         });
-        $('#daftar_siswa').DataTable({
+        $('#dataTable').DataTable({
             responsive: true,
-            dom: 'Bfrtip',
-            buttons: [{
-                extend: 'excel',
-                className: 'btn-success'
-            }]
-        });
-        $('#ipa').DataTable({
-            // responsive: true
-            responsive: {
-                details: true
-            },
-            dom: 'Bfrtip',
-            buttons: [{
-                extend: 'excel',
-                className: 'btn-success'
-            }]
-        });
-        $('#ips').DataTable({
-            // responsive: true
-            responsive: {
-                details: true
-            },
-            dom: 'Bfrtip',
-            buttons: [{
-                extend: 'excel',
-                className: 'btn-success'
-            }]
-        });
-        $('#smk').DataTable({
-            // responsive: true
-            responsive: {
-                details: true
-            },
             dom: 'Bfrtip',
             buttons: [{
                 extend: 'excel',

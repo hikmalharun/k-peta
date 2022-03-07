@@ -71,7 +71,6 @@ class Dashboard extends CI_Controller
         //End Hari Tanggal
         $data['title'] = "DASHBOARD";
         $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
-
         if ($data['user']['password'] == md5($data['user']['password_default'])) {
             if ($data['user']['role_id'] == 1) {
                 $this->session->set_flashdata('profile', '<div class="alert alert-danger" role="alert">Silahkan ubah password anda!.</div>');

@@ -6,6 +6,7 @@ class Pegawai_model extends CI_Model
     private $sekolah = 'sekolah';
     private $daftar_pegawai = 'daftar_pegawai';
     private $pengguna = 'pengguna';
+    private $absen = 'absen';
 
     public function getSekolah()
     {
@@ -69,4 +70,5 @@ class Pegawai_model extends CI_Model
     {
         $this->db->update($this->pengguna, $data, $where);
     }
+
 }

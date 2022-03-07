@@ -83,7 +83,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="table-responsive">
-                                    <table class="table table-hover display nowrap mb-0" id="sekolah">
+                                    <table class="table table-hover display nowrap mb-0" id="table">
                                         <thead>
                                             <tr>
                                                 <th>Nama</th>
