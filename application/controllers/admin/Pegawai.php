@@ -414,4 +414,15 @@ class Pegawai extends CI_Controller
         $this->email->message($message);
         $this->email->send();
     }
+
+    public function data_pengguna()
+    {
+        $data['title'] = "DATA PEGAWAI";
+        $data['sekolah'] = $this->Pegawai_model->getSekolah();
+        $data['data_pegawai'] = $this->Pegawai_model->getPegawai();
+        $data['data_pengguna'] = $this->Pegawai_model->getPengguna();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['pegawai'] = $this->db->get_where('daftar_pegawai', ['email' => $this->session->userdata('email')])->row_array();
+        $this->load->view('admin/data_pengguna', $data);
+    }
 }

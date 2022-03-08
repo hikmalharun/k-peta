@@ -24,6 +24,14 @@ class Pegawai_model extends CI_Model
         return $query->result();
     }
 
+    public function getPengguna()
+    {
+        $this->db->from($this->pengguna);
+        $this->db->order_by("id", "asc");
+        $query = $this->db->get();
+        return $query->result();
+    }
+
     public function getWhereSekolah($id)
     {
         $this->db->from($this->sekolah);
@@ -70,5 +78,4 @@ class Pegawai_model extends CI_Model
     {
         $this->db->update($this->pengguna, $data, $where);
     }
-
 }

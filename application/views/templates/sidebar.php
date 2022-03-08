@@ -149,6 +149,14 @@
                 <span class="menu-title text-truncate" data-i18n="Laporan & Rekapitulasi">Data Pegawai</span>
             </a>
         </li>
+        <li class="<?php if ($this->uri->segment(3) == 'data_pengguna') {
+                        echo 'active ';
+                    } ?>nav-item">
+            <a class="d-flex align-items-center" href="<?php echo base_url(); ?>admin/pegawai/data_pengguna">
+                <i data-feather='users'></i>
+                <span class="menu-title text-truncate" data-i18n="Laporan & Rekapitulasi">Data Pengguna</span>
+            </a>
+        </li>
     <?php } ?>
         </ul>
     </div>
