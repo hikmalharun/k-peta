@@ -81,19 +81,10 @@
                 type: 'POST',
                 dataType: 'json',
                 data: {longitude: longitude, latitude: latitude,image:image},
-            })
-            .done(function(data) {
-                if (data > 0) {
-                    alert('insert data sukses');
-                    $('#register')[0].reset();
+                success: function(data){
+                    location.reload();
                 }
             })
-            .fail(function() {
-                console.log("error");
-            })
-            .always(function() {
-                console.log("complete");
-            });
             
             
         });

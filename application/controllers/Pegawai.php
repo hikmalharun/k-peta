@@ -153,7 +153,15 @@ class Pegawai extends CI_Controller
 
     function absen()
     {
-        $this->load->view('absen', []);
+        $id_pengguna =  $this->session->userdata('id_pengguna');
+        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
+        if($cekAbsen){
+            $this->load->view('sudah_absen', ['message' => 'Anda sudah absen hari ini pada jam '. $cekAbsen['jam_absen']]);
+        }
+        else{
+            $this->load->view('absen', []);
+        }
+        
     }
 
     function upload_image()
@@ -179,7 +187,7 @@ class Pegawai extends CI_Controller
 			$address = $geolocation->name . ', ' . $geolocation->adminName1 . ', ' . $geolocation->countryName;
 		}
 
-        
+        date_default_timezone_set('Asia/Jakarta');
 
 		$image = $this->input->post('image');
 		$image = str_replace('data:image/jpeg;base64,','', $image);
@@ -206,7 +214,6 @@ class Pegawai extends CI_Controller
 
 		$res = $this->db->insert('absen', $data);
         $this->session->set_flashdata('absen', '<div class="alert alert-success fade show" role="alert">Absen Tersimpan.</div>');
-        redirect('pegawai/absen');
 		echo json_encode($res);
 	}
 }
