@@ -153,16 +153,7 @@ class Pegawai extends CI_Controller
 
     function absen()
     {
-        if ($_POST["action"] == "Add") {
-            $insert_data = array(
-                'first_name' => $this->input->post('first_name'),
-                'last_name' => $this->input->post("last_name"),
-                'image' => $this->upload_image()
-            );
-            $this->load->model('crud_model');
-            $this->crud_model->insert_crud($insert_data);
-            echo 'Data Inserted';
-        }
+        $this->load->view('absen', []);
     }
 
     function upload_image()
@@ -175,4 +166,46 @@ class Pegawai extends CI_Controller
             return $new_name;
         }
     }
+
+    public function submit_absen()
+	{
+        $this->load->library('geonames');
+		$longitude = $this->input->post('longitude');
+		$latitude = $this->input->post('latitude');
+        $data  = ['lat' => $latitude, 'long' => $longitude];
+        $geolocation = isset(json_decode($this->geonames->getPlaceName($data))->geonames[0] )?json_decode($this->geonames->getPlaceName($data))->geonames[0] : null;
+        $address = '';
+        if($geolocation){
+			$address = $geolocation->name . ', ' . $geolocation->adminName1 . ', ' . $geolocation->countryName;
+		}
+
+        
+
+		$image = $this->input->post('image');
+		$image = str_replace('data:image/jpeg;base64,','', $image);
+		$image = base64_decode($image);
+		$filename = 'image_'.time().'.png';
+		file_put_contents(FCPATH.'/uploads/'.$filename,$image);
+		
+
+        $data = array(
+			'nama' => 'nama disini',
+			'email' => 'email disini',
+			'sekolah' => 'sekolah ',
+			'status_absen' => 'yes',
+            'jam_absen' => date('H:i'),
+            'tanggal_absen' => date('Y-m-d'),
+            'koordinat' => $latitude. ','. $longitude,
+            'gambar' => $filename,
+            'latitude' => $latitude,
+            'longitude' => $longitude ,
+            'address' => $address
+		); 
+		
+
+		$res = $this->db->insert('absen', $data);
+        $this->session->set_flashdata('absen', '<div class="alert alert-success fade show" role="alert">Absen Tersimpan.</div>');
+        redirect('pegawai/absen');
+		echo json_encode($res);
+	}
 }
