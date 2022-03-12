@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50505
 File Encoding         : 65001
 
-Date: 2022-03-12 12:24:43
+Date: 2022-03-12 12:51:37
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -34,14 +34,13 @@ CREATE TABLE `absen` (
   `longitude` varchar(50) DEFAULT NULL,
   `address` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of absen
 -- ----------------------------
-INSERT INTO `absen` VALUES ('1', '6', 'nama disini', 'email disini', 'sekolah ', 'yes', '05:24', '2022-03-12', '-6.3799296,106.8924928', 'image_1647059095.png', '-6.3799296', '106.8924928', 'Rawasepat, West Java, Indonesia');
-INSERT INTO `absen` VALUES ('2', '6', 'nama disini', 'email disini', 'sekolah ', 'yes', '05:29', '2022-03-12', '-6.3799296,106.8924928', 'image_1647059390.png', '-6.3799296', '106.8924928', 'Rawasepat, West Java, Indonesia');
-INSERT INTO `absen` VALUES ('3', '6', 'nama disini', 'pandureynaldo02@gmail.com', 'sekolah ', 'yes', '06:22', '2022-03-12', '-6.3799296,106.8924928', 'image_1647062577.png', '-6.3799296', '106.8924928', 'Rawasepat, West Java, Indonesia');
+INSERT INTO `absen` VALUES ('1', '6', 'nama disini', 'email disini', 'sekolah ', 'yes', '05:24', '2022-03-11', '-6.3799296,106.8924928', 'image_1647059095.png', '-6.3799296', '106.8924928', 'Rawasepat, West Java, Indonesia');
+INSERT INTO `absen` VALUES ('2', '6', 'nama disini', 'email disini', 'sekolah ', 'yes', '05:29', '2022-03-10', '-6.3799296,106.8924928', 'image_1647059390.png', '-6.3799296', '106.8924928', 'Rawasepat, West Java, Indonesia');
 
 -- ----------------------------
 -- Table structure for `daftar_pegawai`
@@ -207,7 +206,7 @@ CREATE TABLE `pengguna_riwayat` (
   `browser` varchar(255) NOT NULL,
   `os` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of pengguna_riwayat
@@ -241,6 +240,7 @@ INSERT INTO `pengguna_riwayat` VALUES ('26', 'Pandu Reynaldo', 'pandureynaldo02@
 INSERT INTO `pengguna_riwayat` VALUES ('27', 'Pandu Reynaldo', 'pandureynaldo02@gmail.com', 'SMAN 1 ANJATAN', '2', 'Login', '12-03-2022 10:49:20', '::1', 'Chrome', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36');
 INSERT INTO `pengguna_riwayat` VALUES ('28', 'Pandu Reynaldo', 'pandureynaldo02@gmail.com', 'SMAN 1 ANJATAN', '2', 'Login', '12-03-2022 12:18:40', '::1', 'Chrome', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36');
 INSERT INTO `pengguna_riwayat` VALUES ('29', 'Pandu Reynaldo', 'pandureynaldo02@gmail.com', 'SMAN 1 ANJATAN', '2', 'Login', '12-03-2022 12:22:46', '::1', 'Chrome', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36');
+INSERT INTO `pengguna_riwayat` VALUES ('30', 'Pandu Reynaldo', 'pandureynaldo02@gmail.com', 'SMAN 1 ANJATAN', '2', 'Login', '12-03-2022 12:45:48', '::1', 'Chrome', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36');
 
 -- ----------------------------
 -- Table structure for `sekolah`

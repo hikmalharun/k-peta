@@ -84,6 +84,16 @@ class Authentication extends CI_Controller
 			'required' => 'Password harus diisi!'
 		]);
 
+		$session_check = $role_id = $this->session->userdata('role_id');
+
+		if($session_check){
+			if ($this->session->userdata('role_id') ==  1) {
+				redirect('admin/dashboard');
+			} else {
+				redirect('dashboard');
+			}
+		}
+
 		if ($this->form_validation->run() == false) {
 			$data['title'] = 'K-PETA | LOGIN';
 			$this->load->view('auth/header', $data);
