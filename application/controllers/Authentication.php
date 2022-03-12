@@ -274,7 +274,8 @@ class Authentication extends CI_Controller
 				if ($password == $user['password']) {
 					$data = [
 						'email' => $user['email'],
-						'role_id' => $user['role_id']
+						'role_id' => $user['role_id'],
+						'id_pengguna' => $user['id']
 					];
 					$this->session->set_userdata($data);
 					if ($this->session->userdata('role_id') ==  1) {

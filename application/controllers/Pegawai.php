@@ -190,8 +190,9 @@ class Pegawai extends CI_Controller
 
         $data = array(
 			'nama' => 'nama disini',
-			'email' => 'email disini',
+			'email' =>  $this->session->userdata('email'),
 			'sekolah' => 'sekolah ',
+            'id_pengguna' =>  $this->session->userdata('id_pengguna'),
 			'status_absen' => 'yes',
             'jam_absen' => date('H:i'),
             'tanggal_absen' => date('Y-m-d'),
