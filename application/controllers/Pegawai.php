@@ -52,14 +52,14 @@ class Pegawai extends CI_Controller
     public function profile()
     {
         $data['title'] = "PROFILE";
-        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
         $this->load->view('profile', $data);
     }
 
     public function edit_profile()
     {
         $data['title'] = "EDIT PROFILE";
-        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
         $this->load->view('edit_profile', $data);
     }
 
@@ -70,7 +70,7 @@ class Pegawai extends CI_Controller
         $new1 = $this->input->post('password1');
         $new2 = $this->input->post('password2');
 
-        $data_user = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data_user = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
         if ($data_user['password'] == $old) {
             if ($new1 == $new2) {
                 $where = array(
@@ -94,7 +94,7 @@ class Pegawai extends CI_Controller
 
     public function edit_gambar()
     {
-        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
 
         $id = $this->input->post('id');
         $gambar = $_FILES['gambar']['name'];
@@ -131,7 +131,7 @@ class Pegawai extends CI_Controller
         $nama = $this->input->post('name');
         $alamat = $this->input->post('alamat');
 
-        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
         $id = $data['user']['id'];
         $old_nama = $data['user']['name'];
         $old_alamat = $data['user']['alamat'];
@@ -155,13 +155,12 @@ class Pegawai extends CI_Controller
     {
         $id_pengguna =  $this->session->userdata('id_pengguna');
         $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
-        if($cekAbsen){
-            $this->load->view('sudah_absen', ['message' => 'Anda sudah absen hari ini pada jam '. $cekAbsen['jam_absen']]);
-        }
-        else{
+        if ($cekAbsen) {
+            $this->session->set_flashdata('absen', '<div class="alert alert-success" role="alert">Anda sudah absen ' . $cekAbsen['status_absen'] . ' hari ini pada jam ' . $cekAbsen['jam_absen'] . '</div>');
+            redirect('admin/dashboard');
+        } else {
             $this->load->view('absen', []);
         }
-        
     }
 
     function upload_image()
@@ -176,44 +175,52 @@ class Pegawai extends CI_Controller
     }
 
     public function submit_absen()
-	{
+    {
+        $id_pengguna =  $this->session->userdata('id_pengguna');
+        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
+        if ($cekAbsen) {
+            $status_absen = 'Pulang';
+        } else {
+            $status_absen = 'Masuk';
+        }
         $this->load->library('geonames');
-		$longitude = $this->input->post('longitude');
-		$latitude = $this->input->post('latitude');
+        $longitude = $this->input->post('longitude');
+        $latitude = $this->input->post('latitude');
         $data  = ['lat' => $latitude, 'long' => $longitude];
-        $geolocation = isset(json_decode($this->geonames->getPlaceName($data))->geonames[0] )?json_decode($this->geonames->getPlaceName($data))->geonames[0] : null;
+        $geolocation = isset(json_decode($this->geonames->getPlaceName($data))->geonames[0]) ? json_decode($this->geonames->getPlaceName($data))->geonames[0] : null;
         $address = '';
-        if($geolocation){
-			$address = $geolocation->name . ', ' . $geolocation->adminName1 . ', ' . $geolocation->countryName;
-		}
+        if ($geolocation) {
+            $address = $geolocation->name . ', ' . $geolocation->adminName1 . ', ' . $geolocation->countryName;
+        }
 
         date_default_timezone_set('Asia/Jakarta');
 
-		$image = $this->input->post('image');
-		$image = str_replace('data:image/jpeg;base64,','', $image);
-		$image = base64_decode($image);
-		$filename = 'image_'.time().'.png';
-		file_put_contents(FCPATH.'/uploads/'.$filename,$image);
-		
+        $image = $this->input->post('image');
+        $image = str_replace('data:image/jpeg;base64,', '', $image);
+        $image = base64_decode($image);
+        $filename = 'image_' . time() . '.png';
+        file_put_contents(FCPATH . '/uploads/' . $filename, $image);
+
+        $row_user = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
 
         $data = array(
-			'nama' => 'nama disini',
-			'email' =>  $this->session->userdata('email'),
-			'sekolah' => 'sekolah ',
-            'id_pengguna' =>  $this->session->userdata('id_pengguna'),
-			'status_absen' => 'yes',
-            'jam_absen' => date('H:i'),
+            'nama' => $row_user['name'],
+            'email' =>  $row_user['email'],
+            'sekolah' => $row_user['sekolah'],
+            'id_pengguna' =>  $row_user['id'],
+            'status_absen' => $status_absen,
+            'jam_absen' => date('H:i:s'),
             'tanggal_absen' => date('Y-m-d'),
-            'koordinat' => $latitude. ','. $longitude,
+            'koordinat' => $latitude . ',' . $longitude,
             'gambar' => $filename,
             'latitude' => $latitude,
-            'longitude' => $longitude ,
+            'longitude' => $longitude,
             'address' => $address
-		); 
-		
+        );
 
-		$res = $this->db->insert('absen', $data);
+
+        $res = $this->db->insert('absen', $data);
         $this->session->set_flashdata('absen', '<div class="alert alert-success fade show" role="alert">Absen Tersimpan.</div>');
-		echo json_encode($res);
-	}
+        echo json_encode($res);
+    }
 }

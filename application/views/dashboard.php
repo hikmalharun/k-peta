@@ -52,24 +52,43 @@
                         <div class="profile-image-wrapper">
                             <div class="profile-image">
                                 <div class="avatar">
-                                    <?php if ($user['gambar'] == 'default.jpg') { ?>
-                                        <?php if ($jam_now > $skema_masuk) { ?>
-                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#absen">
-                                                <i class="far fa-bell"></i>
-                                            </span>
+                                    <?php if ($user['role_id'] == 1) { ?>
+                                        <?php if ($user['gambar'] == 'default.jpg') { ?>
+                                            <?php if ($jam_now > $skema_masuk) { ?>
+                                                <a href="<?php echo base_url() ?>admin/pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
+                                                    <i class="far fa-bell"></i>
+                                                </a>
+                                            <?php } else { ?>
+                                                <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php } ?>
                                         <?php } else { ?>
-                                            <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php if ($jam_now > $skema_masuk) { ?>
+                                                <a href="<?php echo base_url() ?>admin/pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
+                                                    <i class="far fa-bell"></i>
+                                                </a>
+                                            <?php } else { ?>
+                                                <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php } ?>
                                         <?php } ?>
                                     <?php } else { ?>
-                                        <?php if ($jam_now > $skema_masuk) { ?>
-                                            <span class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;" data-bs-toggle="modal" data-bs-target="#absen">
-                                                <i class="far fa-bell"></i>
-                                            </span>
+                                        <?php if ($user['gambar'] == 'default.jpg') { ?>
+                                            <?php if ($jam_now > $skema_masuk) { ?>
+                                                <a href="<?php echo base_url() ?>pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
+                                                    <i class="far fa-bell"></i>
+                                                </a>
+                                            <?php } else { ?>
+                                                <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php } ?>
                                         <?php } else { ?>
-                                            <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php if ($jam_now > $skema_masuk) { ?>
+                                                <a href="<?php echo base_url() ?>pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
+                                                    <i class="far fa-bell"></i>
+                                                </a>
+                                            <?php } else { ?>
+                                                <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php } ?>
                                         <?php } ?>
                                     <?php } ?>
-
                                 </div>
                             </div>
                         </div>
@@ -102,6 +121,11 @@
                             <h3>15:00:00</h3>
                             <h6 class="text-muted">Pulang Kantor</h6>
                             <span class="badge badge-light-danger rounded-pill fs-3">16:35:00</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height: 100px;">
+                            <?php echo $this->session->flashdata('absen'); ?>
                         </td>
                     </tr>
                 </table>
@@ -189,114 +213,6 @@
                     </div>
                 </div>
             </section>
-            <section>
-                <div class="disabled-backdrop-ex">
-                    <div class="modal fade text-start" id="absen" tabindex="-1" aria-labelledby="myModalLabel4" data-bs-backdrop="false" aria-hidden="true" style="background-color: rgba(0,0,0,2);">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form method="post" id="absen">
-                                        <input type="hidden" id="nama" value="<?php echo $user['name']; ?>">
-                                        <input type="hidden" id="email" value="<?php echo $user['email']; ?>">
-                                        <input type="hidden" id="sekolah" value="<?php echo $user['sekolah']; ?>">
-                                        <?php
-                                        $abs = $this->db->get_where('absen', ['tanggal_absen' => date('d-m-Y')])->num_rows();
-                                        $abs = $this->db->get_where('absen', ['email' => $user['email']])->num_rows();
-                                        ?>
-                                        <?php
-                                        if ($abs > 0) { ?>
-                                            <input type="hidden" id="status_absen" value="Pulang">
-                                        <?php } else { ?>
-                                            <input type="hidden" id="status_absen" value="Masuk">
-                                        <?php } ?>
-                                        <input type="hidden" id="tanggal_absen" value="<?php echo date('d-m-Y'); ?>">
-                                        <input type="hidden" id="jam_absen" value="<?php echo date('H:i:s'); ?>">
-                                        <video autoplay="true" id="gambar" style="width: 100%;"></video>
-                                        <button type="submit" class="btn btn-danger waves-effect waves-float waves-light avatar pt-2 pb-2 position-absolute bottom-0 start-50 translate-middle-x mb-2">
-                                            <i class="fas fa-camera"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <script type="text/javascript">
-                    // seleksi elemen video
-                    var video = document.querySelector("#gambar");
-                    // minta izin user
-                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
-                    // jika user memberikan izin
-                    if (navigator.getUserMedia) {
-                        // jalankan fungsi handleVideo, dan videoError jika izin ditolak
-                        navigator.getUserMedia({
-                            audio: false,
-                            video: true,
-                        }, handleVideo, videoError);
-                    }
-                    // fungsi ini akan dieksekusi jika  izin telah diberikan
-                    function handleVideo(stream) {
-                        video.srcObject = stream;
-                    }
-                    // fungsi ini akan dieksekusi kalau user menolak izin
-                    function videoError(e) {
-                        // do something
-                        alert("Izinkan menggunakan camera")
-                    }
-                </script>
-                <script>
-                    $(document).on('submit', '#absen', function(event) {
-                        event.preventDefault();
-                        var nama = $('#nama').val();
-                        var email = $('#email').val();
-                        var sekolah = $('#sekolah').val();
-                        var status_absen = $('#status_absen').val();
-                        var tanggal_absen = $('#tanggal_absen').val();
-                        var jam_absen = $('#jam_absen').val();
-                        var gambar = $("#gambar").val();
-                        $.ajax({
-                            url: "<?php echo base_url() . 'pegawai/absen' ?>",
-                            method: 'POST',
-                            data: new FormData(this),
-                            contentType: false,
-                            processData: false,
-                            success: function() {
-                                $('#absen').modal('hide');
-                                alert('Absen berhasil.');
-                            }
-                        });
-                    });
-                </script>
-                <script>
-                    function takeSnapshot() {
-                        // buat elemen img
-                        var img = document.createElement('img');
-                        var context;
-
-                        // ambil ukuran video
-                        var width = video.offsetWidth,
-                            height = video.offsetHeight;
-
-                        // buat elemen canvas
-                        canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        // ambil gambar dari video dan masukan 
-                        // ke dalam canvas
-                        context = canvas.getContext('2d');
-                        context.drawImage(video, 0, 0, width, height);
-
-                        // render hasil dari canvas ke elemen img
-                        img.src = canvas.toDataURL('image/png');
-                        document.body.appendChild(img);
-                    }
-                </script>
-            </section>
-            <!-- Dashboard Analytics end -->
         </div>
     </div>
 </div>

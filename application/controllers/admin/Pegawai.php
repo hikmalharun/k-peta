@@ -368,7 +368,7 @@ class Pegawai extends CI_Controller
         //Kirim email verifikasi
         $this->_sendEmail($token, $name, $password, $type);
         $this->session->set_flashdata('pesan_token', '<div class="alert alert-success" role="alert">Silahkan lakukan verifikasi akun melalui email.</div>');
-        redirect('admin/pegawai/data_pegawai');
+        redirect('admin/pegawai/data_pengguna');
     }
 
     private function _sendEmail($token, $name, $password, $type)
@@ -424,5 +424,77 @@ class Pegawai extends CI_Controller
         $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
         $data['pegawai'] = $this->db->get_where('daftar_pegawai', ['email' => $this->session->userdata('email')])->row_array();
         $this->load->view('admin/data_pengguna', $data);
+    }
+
+    function absen()
+    {
+        $id_pengguna =  $this->session->userdata('id_pengguna');
+        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
+        if ($cekAbsen) {
+            $this->session->set_flashdata('absen', '<div class="alert alert-success" role="alert">Anda sudah absen ' . $cekAbsen['status_absen'] . ' hari ini pada jam ' . $cekAbsen['jam_absen'] . '</div>');
+            redirect('admin/dashboard');
+        } else {
+            $this->load->view('absen', []);
+        }
+    }
+
+    function upload_image()
+    {
+        if (isset($_FILES["user_image"])) {
+            $extension = explode('.', $_FILES['user_image']['name']);
+            $new_name = rand() . '.' . $extension[1];
+            $destination = './upload/' . $new_name;
+            move_uploaded_file($_FILES['user_image']['tmp_name'], $destination);
+            return $new_name;
+        }
+    }
+
+    public function submit_absen()
+    {
+        $id_pengguna =  $this->session->userdata('id_pengguna');
+        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
+        if ($cekAbsen) {
+            $status_absen = 'Pulang';
+        } else {
+            $status_absen = 'Masuk';
+        }
+        $this->load->library('geonames');
+        $longitude = $this->input->post('longitude');
+        $latitude = $this->input->post('latitude');
+        $data  = ['lat' => $latitude, 'long' => $longitude];
+        $geolocation = isset(json_decode($this->geonames->getPlaceName($data))->geonames[0]) ? json_decode($this->geonames->getPlaceName($data))->geonames[0] : null;
+        $address = '';
+        if ($geolocation) {
+            $address = $geolocation->name . ', ' . $geolocation->adminName1 . ', ' . $geolocation->countryName;
+        }
+
+        date_default_timezone_set('Asia/Jakarta');
+
+        $image = $this->input->post('image');
+        $image = str_replace('data:image/jpeg;base64,', '', $image);
+        $image = base64_decode($image);
+        $filename = 'image_' . time() . '.png';
+        file_put_contents(FCPATH . '/uploads/' . $filename, $image);
+
+        $row_user = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+
+        $data = array(
+            'nama' => $row_user['name'],
+            'email' =>  $row_user['email'],
+            'sekolah' => $row_user['sekolah'],
+            'id_pengguna' =>  $row_user['id'],
+            'status_absen' => $status_absen,
+            'jam_absen' => date('H:i:s'),
+            'tanggal_absen' => date('Y-m-d'),
+            'koordinat' => $latitude . ',' . $longitude,
+            'gambar' => $filename,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'address' => $address
+        );
+
+        $res = $this->db->insert('absen', $data);
+        $this->session->set_flashdata('absen', '<div class="alert alert-success fade show" role="alert">Absen Tersimpan.</div>');
+        echo json_encode($res);
     }
 }
