@@ -71,6 +71,11 @@ class Dashboard extends CI_Controller
         //End Hari Tanggal
         $data['title'] = "DASHBOARD";
         $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['countAbsen'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d')])->num_rows();
+        $data['masuk'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Masuk'])->row_array();
+        $data['pulang'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Pulang'])->row_array();
+        $data['skema'] = $this->db->get_where('skema', ['email' => $this->session->userdata('email')])->row_array();
+
         if ($data['user']['password'] == md5($data['user']['password_default'])) {
             if ($data['user']['role_id'] == 1) {
                 $this->session->set_flashdata('profile', '<div class="alert alert-danger" role="alert">Silahkan ubah password anda!.</div>');

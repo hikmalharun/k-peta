@@ -86,12 +86,4 @@ class Install extends CI_Controller
         $this->email->message('Password is : ' . $password);
         $this->email->send();
     }
-
-    public function applikasi()
-    {
-        $data['title'] = 'INSTALLATION';
-        $this->load->view('auth/header', $data);
-        $this->load->view('auth/installation', $data);
-        $this->load->view('auth/footer');
-    }
 }

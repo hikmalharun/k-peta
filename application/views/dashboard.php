@@ -38,13 +38,47 @@
                         </tr>
                     </table>
                 </div>
+
                 <?php
-                $tanggal_now = date_default_timezone_set('Asia/Jakarta');
-                $tanggal_now = date('d-m-Y');
-                $jam_now = date_default_timezone_set('Asia/Jakarta');
-                $jam_now = date('H:i:s');
-                $skema_masuk = '07:00:00';
-                $skema_pulang = '12:00:00';
+                if ($countAbsen == 1) {
+                    // Absen Masuk
+                    $lat1 = $masuk['latitude'];
+                    $lat2 = $skema['latitude'];
+                    $long1 = $masuk['longitude'];
+                    $long2 = $skema['longitude'];
+                    $theta = $long1 - $long2;
+                    $miles = (sin(deg2rad($lat1))) * sin(deg2rad($lat2)) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
+                    $miles = acos($miles);
+                    $miles = rad2deg($miles);
+                    $miles = $miles * 60 * 1.1515;
+                    $masuk_meters = $miles * 1609;
+                } elseif ($countAbsen == 2) {
+                    // Absen Masuk
+                    $lat1 = $masuk['latitude'];
+                    $lat2 = $skema['latitude'];
+                    $long1 = $masuk['longitude'];
+                    $long2 = $skema['longitude'];
+                    $theta = $long1 - $long2;
+                    $miles = (sin(deg2rad($lat1))) * sin(deg2rad($lat2)) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
+                    $miles = acos($miles);
+                    $miles = rad2deg($miles);
+                    $miles = $miles * 60 * 1.1515;
+                    $masuk_meters = $miles * 1609;
+                    // Absen Pulang
+                    $lat1 = $pulang['latitude'];
+                    $lat2 = $skema['latitude'];
+                    $long1 = $pulang['longitude'];
+                    $long2 = $skema['longitude'];
+                    $theta = $long1 - $long2;
+                    $miles = (sin(deg2rad($lat1))) * sin(deg2rad($lat2)) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
+                    $miles = acos($miles);
+                    $miles = rad2deg($miles);
+                    $miles = $miles * 60 * 1.1515;
+                    $pulang_meters = $miles * 1609;
+                } else {
+                    $masuk_meters = 0;
+                    $pulang_meters = 0;
+                }
                 ?>
                 <div class="card card-profile">
                     <img src="<?php echo base_url(); ?>assets/images/bg-profile.jpg" class="img-fluid card-img-top" alt="Profile Cover Photo">
@@ -52,42 +86,56 @@
                         <div class="profile-image-wrapper">
                             <div class="profile-image">
                                 <div class="avatar">
-                                    <?php if ($user['role_id'] == 1) { ?>
-                                        <?php if ($user['gambar'] == 'default.jpg') { ?>
-                                            <?php if ($jam_now > $skema_masuk) { ?>
-                                                <a href="<?php echo base_url() ?>admin/pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
-                                                    <i class="far fa-bell"></i>
-                                                </a>
+                                    <?php
+                                    $nows = date_default_timezone_set('Asia/Jakarta');
+                                    $nows = date('H:i:s');
+                                    $jam = strtotime($nows);
+                                    $jam_masuk = strtotime($skema['masuk']);
+                                    //$jam_masuk = strtotime('13:30:00');
+                                    $jam_pulang = strtotime($skema['pulang']);
+                                    //$jam_pulang = strtotime('19:00:00');
+                                    $batas_awal_masuk = $jam_masuk - 7200;
+                                    $batas_akhir_masuk = $jam_masuk + 7200;
+                                    $batas_akhir_pulang = $jam_pulang + 7200;
+                                    ?>
+                                    <?php if ($jam < $batas_akhir_masuk) { ?>
+                                        <?php if ($jam > $batas_awal_masuk) { ?>
+                                            <?php if ($countAbsen == 1) { ?>
+                                                <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
                                             <?php } else { ?>
-                                                <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
+                                                <?php if ($user['role_id'] == 2) { ?>
+                                                    <a href="<?php echo base_url('pegawai/absen') ?>">
+                                                        <i class="fas fa-bell text-warning" style="font-size: 80px; padding: 10px 14px 10px 14px;"></i>
+                                                    </a>
+                                                <?php } else { ?>
+                                                    <a href="<?php echo base_url('admin/pegawai/absen') ?>">
+                                                        <i class="fas fa-bell text-warning" style="font-size: 80px; padding: 10px 14px 10px 14px;"></i>
+                                                    </a>
+                                                <?php } ?>
                                             <?php } ?>
                                         <?php } else { ?>
-                                            <?php if ($jam_now > $skema_masuk) { ?>
-                                                <a href="<?php echo base_url() ?>admin/pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
-                                                    <i class="far fa-bell"></i>
-                                                </a>
-                                            <?php } else { ?>
+                                            <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
+                                        <?php } ?>
+                                    <?php } elseif ($jam > $jam_pulang) { ?>
+                                        <?php if ($jam < $batas_akhir_pulang) { ?>
+                                            <?php if ($countAbsen == 2) { ?>
                                                 <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
+                                            <?php } else { ?>
+                                                <?php if ($user['role_id'] == 2) { ?>
+                                                    <a href="<?php echo base_url('pegawai/absen') ?>">
+                                                        <i class="fas fa-bell text-warning" style="font-size: 80px; padding: 10px 14px 10px 14px;"></i>
+                                                    </a>
+                                                <?php } else { ?>
+                                                    <a href="<?php echo base_url('admin/pegawai/absen') ?>">
+                                                        <i class="fas fa-bell text-warning" style="font-size: 80px; padding: 10px 14px 10px 14px;"></i>
+                                                    </a>
+                                                <?php } ?>
                                             <?php } ?>
+                                        <?php } else { ?>
+                                            <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
                                         <?php } ?>
                                     <?php } else { ?>
-                                        <?php if ($user['gambar'] == 'default.jpg') { ?>
-                                            <?php if ($jam_now > $skema_masuk) { ?>
-                                                <a href="<?php echo base_url() ?>pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
-                                                    <i class="far fa-bell"></i>
-                                                </a>
-                                            <?php } else { ?>
-                                                <img src="<?php echo base_URL('assets/images/') . $user['gambar']; ?>" alt="gambar">
-                                            <?php } ?>
-                                        <?php } else { ?>
-                                            <?php if ($jam_now > $skema_masuk) { ?>
-                                                <a href="<?php echo base_url() ?>pegawai/absen" class="text-warning" style="font-size: 5em; padding-left: 20px; padding-right: 20px;">
-                                                    <i class="far fa-bell"></i>
-                                                </a>
-                                            <?php } else { ?>
-                                                <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
-                                            <?php } ?>
-                                        <?php } ?>
+                                        <img src="<?php echo base_URL('assets/images/profile/') . $user['gambar']; ?>" alt="gambar">
                                     <?php } ?>
                                 </div>
                             </div>
@@ -106,26 +154,39 @@
                 </div>
             </section>
             <section class="text-center mt-2">
-                <h6 class="fs-6">SKEMA : ABSESNSI DI KANTOR</h6>
-                <h6 class="fs-6">LOKASI : SMAN 1 ANJATAN</h6>
+                <h6 class="fs-6">SKEMA : ABSESNSI DI <?php echo $skema['lokasi']; ?></h6>
+                <h6 class="fs-6">LOKASI : <?php echo $skema['lokasi']; ?></h6>
                 <table style="width: 100%;" class="mt-1">
                     <tr>
                         <td>
-                            <i class="far fa-clock fs-1"></i>
-                            <h3>07:00:00</h3>
-                            <h6 class="text-muted">Masuk Kantor</h6>
-                            <span class="badge badge-light-success rounded-pill fs-3">06:55:00</span>
+                            <?php if ($masuk) { ?>
+                                <i class="far fa-clock fs-1"></i>
+                                <h3><?php echo $skema['masuk']; ?></h3>
+                                <h6 class="text-muted">Masuk Kantor</h6>
+                                <span class="badge badge-light-success rounded-pill fs-3"><?php echo $masuk['jam_absen']; ?></span><br>
+                                <p class="badge badge-light-success rounded-pill fs-5"><?php echo round($masuk_meters, 0); ?> Meter</p>
+                            <?php } else { ?>
+                                <i class="far fa-clock fs-1"></i>
+                                <h3><?php echo $skema['masuk']; ?></h3>
+                                <h6 class="text-muted">Masuk Kantor</h6>
+                                <span class="badge badge-light-success rounded-pill fs-3">-</span><br>
+                                <p class="badge badge-light-success rounded-pill fs-5">0 Meter</p>
+                            <?php } ?>
                         </td>
                         <td>
-                            <i class="far fa-clock fs-1"></i>
-                            <h3>15:00:00</h3>
-                            <h6 class="text-muted">Pulang Kantor</h6>
-                            <span class="badge badge-light-danger rounded-pill fs-3">16:35:00</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="height: 100px;">
-                            <?php echo $this->session->flashdata('absen'); ?>
+                            <?php if ($pulang) { ?>
+                                <i class="far fa-clock fs-1"></i>
+                                <h3><?php echo $skema['pulang']; ?></h3>
+                                <h6 class="text-muted">Pulang Kantor</h6>
+                                <span class="badge badge-light-danger rounded-pill fs-3"><?php echo $pulang['jam_absen']; ?></span><br>
+                                <p class="badge badge-light-danger rounded-pill fs-5"><?php echo round($pulang_meters, 0); ?> Meter</p>
+                            <?php } else { ?>
+                                <i class="far fa-clock fs-1"></i>
+                                <h3><?php echo $skema['pulang']; ?></h3>
+                                <h6 class="text-muted">Pulang Kantor</h6>
+                                <span class="badge badge-light-danger rounded-pill fs-3">-</span><br>
+                                <p class="badge badge-light-danger rounded-pill fs-5">0 Meter</p>
+                            <?php } ?>
                         </td>
                     </tr>
                 </table>

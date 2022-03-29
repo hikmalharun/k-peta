@@ -52,14 +52,14 @@ class Pegawai extends CI_Controller
     public function profile()
     {
         $data['title'] = "PROFILE";
-        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
         $this->load->view('profile', $data);
     }
 
     public function edit_profile()
     {
         $data['title'] = "EDIT PROFILE";
-        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
         $this->load->view('edit_profile', $data);
     }
 
@@ -70,7 +70,7 @@ class Pegawai extends CI_Controller
         $new1 = $this->input->post('password1');
         $new2 = $this->input->post('password2');
 
-        $data_user = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
+        $data_user = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
         if ($data_user['password'] == $old) {
             if ($new1 == $new2) {
                 $where = array(
@@ -94,7 +94,7 @@ class Pegawai extends CI_Controller
 
     public function edit_gambar()
     {
-        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
 
         $id = $this->input->post('id');
         $gambar = $_FILES['gambar']['name'];
@@ -131,7 +131,7 @@ class Pegawai extends CI_Controller
         $nama = $this->input->post('name');
         $alamat = $this->input->post('alamat');
 
-        $data['user'] = $this->db->get_where('pengguna', ['id_pengguna' => $this->session->userdata('id_pengguna')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
         $id = $data['user']['id'];
         $old_nama = $data['user']['name'];
         $old_alamat = $data['user']['alamat'];
@@ -153,14 +153,13 @@ class Pegawai extends CI_Controller
 
     function absen()
     {
-        $id_pengguna =  $this->session->userdata('id_pengguna');
-        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
-        if ($cekAbsen) {
-            $this->session->set_flashdata('absen', '<div class="alert alert-success" role="alert">Anda sudah absen ' . $cekAbsen['status_absen'] . ' hari ini pada jam ' . $cekAbsen['jam_absen'] . '</div>');
-            redirect('admin/dashboard');
-        } else {
-            $this->load->view('absen', []);
-        }
+        $data['countAbsen'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d')])->num_rows();
+        $data['cekmasuk'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Masuk'])->row_array();
+        $data['cekpulang'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Pulang'])->row_array();
+        $data['skema'] = $this->db->get_where('skema', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['title'] = "ABSEN";
+        $this->load->view('absen', $data);
     }
 
     function upload_image()

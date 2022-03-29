@@ -428,14 +428,47 @@ class Pegawai extends CI_Controller
 
     function absen()
     {
-        $id_pengguna =  $this->session->userdata('id_pengguna');
-        $cekAbsen = $this->db->get_where('absen', ['id_pengguna' => $id_pengguna, 'tanggal_absen' => date('Y-m-d')])->row_array();
-        if ($cekAbsen) {
-            $this->session->set_flashdata('absen', '<div class="alert alert-success" role="alert">Anda sudah absen ' . $cekAbsen['status_absen'] . ' hari ini pada jam ' . $cekAbsen['jam_absen'] . '</div>');
-            redirect('admin/dashboard');
+        // ================================
+        $data['countAbsen'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d')])->num_rows();
+        // $data['cekmasuk'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Masuk'])->row_array();
+        // $data['cekpulang'] = $this->db->get_where('absen', ['email' => $this->session->userdata('email'), 'tanggal_absen' => date('Y-m-d'), 'status_absen' => 'Pulang'])->row_array();
+        $data['skema'] = $this->db->get_where('skema', ['email' => $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->db->get_where('pengguna', ['email' => $this->session->userdata('email')])->row_array();
+        $data['title'] = "ABSEN";
+        // ================================
+        $nows = date_default_timezone_set('Asia/Jakarta');
+        $nows = date('H:i:s');
+        $jam = strtotime($nows);
+        $jam_masuk = strtotime($data['skema']['masuk']);
+        $jam_pulang = strtotime($data['skema']['pulang']);
+        $batas_awal_masuk = $jam_masuk - 7200;
+        $batas_akhir_masuk = $jam_masuk + 7200;
+        $batas_akhir_pulang = $jam_pulang + 7200;
+        // ================================
+        if ($jam > $batas_awal_masuk && $jam < $batas_akhir_masuk) {
+            if ($data['countAbsen'] == 1) {
+                if ($data['user']['role_id'] == 1) {
+                    redirect('admin/dashboard');
+                } else {
+                    redirect('dashboard');
+                }
+            } else {
+                $this->load->view('absen', $data);
+            }
+        } elseif ($jam > $jam_pulang && $jam < $batas_akhir_pulang) {
+            if ($data['countAbsen'] == 2) {
+                if ($data['user']['role_id'] == 1) {
+                    redirect('admin/dashboard');
+                } else {
+                    redirect('dashboard');
+                }
+            } else {
+                $this->load->view('absen', $data);
+            }
         } else {
-            $this->load->view('absen', []);
+            $this->load->view('absen', $data);
         }
+        // ================================
     }
 
     function upload_image()
